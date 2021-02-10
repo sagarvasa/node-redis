@@ -3,13 +3,7 @@
 
 # Redis keys
 
-export const GLOBAL_PHONE_OTP_LIMIT_KEY = 'redis::phone:globalOtp::';<br />
-export const GLOBAL_EMAIL_OTP_LIMIT_KEY = 'redis::email:globalOtp::';<br />
-export const PHONE_OTP_KEY = 'redis::phone::otp::';<br />
-export const EMAIL_OTP_KEY = 'redis::email::otp::';<br />
-export const GLOBAL_VERIFY_PHONE_OTP_LIMIT_KEY = 'redis::phone:globalVerifyOtp::';<br />
-export const GLOBAL_VERIFY_EMAIL_OTP_LIMIT_KEY = 'redis::email:globalVerifyOtp::';<br />
-
+![OTP Constants](/public/images/otp_constant.png)
 Key name will be constant + (**either phoneNumber or email).
 
 # Global OTP keys:
@@ -48,10 +42,10 @@ expiresAt - Timestamp<br />
 isVerified - Boolean<br />
 createdAt / updatedAt - Timestamp<br />
 
+# Flow diagram
+ 
+Send OTP: 
+![Send OTP](/public/images/node_redis_send_otp.png)
 
-
-
-
-
-
-
+Verify OTP:
+![Verify OTP](/public/images/node_redis_verify_otp.png)
