@@ -36,7 +36,7 @@ export class CoreController {
       return res.status(200).send(resp);
     } catch (err) {
       this.logMessages('[generateOTP][err] ' + err.message, res, true);
-      return res.status(err.status || ErrorConst.INTERNAL_SERVER_ERROR).send(err);
+      return res.status(err.status || ErrorConst.INTERNAL_SERVER_ERROR).send({ message: err.message });
     }
   };
 
@@ -59,10 +59,11 @@ export class CoreController {
         throw new CustomError(ErrorConst.BAD_REQUEST, ErrorConst.VALIDATION_ERROR_MSG);
       }
 
-      return true;
+      let resp = await this.coreService.verifyOtp(otp, globalKey, otpKey, mode, value, res);
+      return res.status(200).send(resp);
     } catch (err) {
       this.logMessages('[verifyOTP][err] ' + err.message, res, true);
-      return res.status(err.status || ErrorConst.INTERNAL_SERVER_ERROR).send(err);
+      return res.status(err.status || ErrorConst.INTERNAL_SERVER_ERROR).send({ message: err.message });
     }
   };
 

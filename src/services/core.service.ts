@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { IPopulatedOtpDocument, ILooseObj, OtpMode } from '../types';
-import { ErrorConst } from '../utilities/errors';
+import { CustomError, ErrorConst } from '../utilities/errors';
 import { Constants } from '../utilities/constants';
 import redisHelper from '../helpers/redis-connector';
 import logger from '../utilities/winston';
@@ -87,6 +87,53 @@ export class CoreService {
       payload['customCode'] = ErrorConst.OTP_GENERIC_ERROR_CODE;
 
       return payload;
+    }
+  }
+
+  async verifyOtp(otp: string, globalKey: string, otpKey: string, mode: OtpMode, value: string, res?: Response) {
+    try {
+      let verifyOtpMaxAttempt = otpConfig.verifyOtpMaxAttempt || 10;
+      const globalOtpResp = await redisHelper.getValue(globalKey);
+
+      if (globalOtpResp && parseInt(globalOtpResp) > verifyOtpMaxAttempt) {
+        throw new CustomError(ErrorConst.BAD_REQUEST, ErrorConst.OTP_LIMIT_REACHED);
+      } else {
+        let otpLimit = '1';
+        if (globalOtpResp) {
+          otpLimit = (parseInt(globalOtpResp) + 1).toString();
+        }
+        redisHelper.setValue(globalKey, otpLimit, otpConfig.verifyOtpGlobalTtl);
+      }
+      const otpResp = await redisHelper.getValue(otpKey);
+
+      if (otpResp === null || otpResp === undefined) {
+        throw new CustomError(ErrorConst.BAD_REQUEST, ErrorConst.OTP_EXPIRED);
+      } else {
+        const parsedOtpResp = JSON.parse(otpResp);
+        if (parseInt(parsedOtpResp.otp) === parseInt(otp)) {
+          // deleting value from redis once successfully verified
+          await redisHelper.deleteValue(otpKey);
+
+          // updating DB value for given mode & value
+          /*
+          this.otpRepository
+            .updateOtpIsVerified(otp, mode, value, { isVerified: true }, res)
+            .then(() => {})
+            .catch((err: { message: string }) => {
+              logger.info('[core-services][updateOtpIsVerified][err] ' + err.message, res, true);
+            });
+          */
+          return { message: Constants.OTP_VERIFICATION_SUCCESS };
+        } else {
+          throw new CustomError(ErrorConst.BAD_REQUEST, ErrorConst.WRONG_OTP);
+        }
+      }
+    } catch (err) {
+      logger.info('[core-services][verifyOtp][err] ' + err.message, res, true);
+      throw new CustomError(
+        Number(err.status) || ErrorConst.INTERNAL_SERVER_ERROR,
+        err.message || ErrorConst.GENERAL_ERROR_MSG,
+      );
     }
   }
 

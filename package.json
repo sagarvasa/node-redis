@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "docker:build": "docker build -t node-ts-mongoose .",
+    "docker:build": "docker build -t node-redis .",
     "docker:run": "docker run -p 3000:3000 -d node-redis",
     "prestart": "npm run build",
     "start": "node ."

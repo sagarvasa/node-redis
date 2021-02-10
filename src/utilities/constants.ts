@@ -17,6 +17,7 @@ export namespace Constants {
 
   export const OTP_SUCCESS = 'OTP sent sucessfully';
   export const OTP_LENGTH = 6;
+  export const OTP_VERIFICATION_SUCCESS = 'OTP verified successfully';
 
   export const MAIL_HANDLER = 'noreply@noderedis.com';
   export const MAIL_SUBJECT_OTP = 'Your OTP for portal is ';
