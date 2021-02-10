@@ -1,5 +1,46 @@
 # node-redis
+POC on OTP logic using node & redis.
+# Steps to start and configure server
+1. Clone/Fork the repo in your workspace
+2. Install the dependancies using `npm install`
+3. Set up environment if applicable in root index.ts (global.env)
+4. Run your redis server and change configuration at src/config/redis.js if applicable
+5. Run command `npm start` to start the server locally
+6. (Only applicable on running on docker) Use `npm run docker:build` & `npm run docker:run` to build and run on docker
+# API
+1. Send OTP Mobile 
+curl --location --request POST 'http://localhost:3000/v1/api/otp/generate.json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "phoneNumber": 9090909090
+}'
 
+2. Send OTP Email
+curl --location --request POST 'http://localhost:3000/v1/api/otp/generate.json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "email": "abc@gmail.com"
+}'
+
+3. Verify OTP Mobile
+curl --location --request POST 'http://localhost:3000/v1/api/otp/verify.json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "mode": "phoneNumber",
+    "value": 9090909090,
+    "otp": "390912"
+}'
+
+4. Verify OTP Email
+curl --location --request POST 'http://localhost:3000/v1/api/otp/verify.json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "mode": "email",
+    "value": "abc@gmail.com",
+    "otp": "390412"
+}'
+
+Note: OTP will be printed on server console since sms & email integration is not part of this POC
 
 # Redis keys
 
